@@ -1,1 +1,1 @@
-1.2
+1.2,https://github.com/RapChapter/Phyton-Updater/releases/download/v1.2/PhytonUpdate1.2.zip
