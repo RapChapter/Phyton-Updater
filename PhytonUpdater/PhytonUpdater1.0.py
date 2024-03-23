@@ -3,7 +3,7 @@ from tkinter import messagebox, colorchooser
 import requests
 import os
 import zipfile
-import re
+import time
 
 def get_latest_version_info():
     try:
@@ -23,10 +23,10 @@ def check_for_updates():
         response = messagebox.askyesno("Update verfügbar", f"Es ist ein Update auf Version {latest_version_info['version']} verfügbar. Möchtest du es installieren?")
         if response == tk.YES:
             download_and_install_update(latest_version_info["url"])
-            return True
     else:
         messagebox.showinfo("Kein Update verfügbar", "Dein Programm ist auf dem neuesten Stand.")
-    return False
+        root.destroy()  # Schließt das Fenster nach 10 Sekunden
+        root.after(10000, root.quit)  # Automatisches Schließen nach 10 Sekunden
 
 def download_and_install_update(download_url):
     try:
@@ -37,36 +37,19 @@ def download_and_install_update(download_url):
         with zipfile.ZipFile(update_file_name, "r") as zip_ref:
             zip_ref.extractall("update")
         os.remove(update_file_name)
-        messagebox.showinfo("Update durchgeführt", "Das Update wurde erfolgreich installiert. Bitte starte das Programm neu, um die neue Version zu verwenden.")
+        messagebox.showinfo("Update durchgeführt", "Das Update wurde erfolgreich installiert. Das Programm wird neu gestartet.")
         root.destroy()
-        # Beachte, dass du den Pfad anpassen musst, um die neue Version korrekt zu starten.
-        os.system(f"python update/{update_file_name.replace('.zip', '.py')}")
+        # Starte das Hauptprogramm
+        os.system("Hauptprogramm.exe")  # Der Dateiname des Hauptprogramms muss hier entsprechend angegeben werden
     except Exception as e:
         messagebox.showerror("Fehler", f"Fehler beim Installieren des Updates: {str(e)}")
-
-def change_color():
-    color = colorchooser.askcolor(title="Choose Text Color")
-    if color[1]:
-        label.config(fg=color[1])
+        messagebox.showinfo("Update fehlgeschlagen", "Bitte versuchen Sie es erneut.")
 
 # Initialisiere das Hauptfenster
 root = tk.Tk()
-root.title("Mein Programm")
-window_width = 900
-window_height = 600
-root.geometry(f"{window_width}x{window_height}")
-
-label = tk.Label(root, text="Hallo", font=("Helvetica", 24))
-label.pack(pady=20)
-
-color_button = tk.Button(root, text="Farbe ändern", command=change_color)
-color_button.pack()
-
-update_button = tk.Button(root, text="Nach Updates suchen", command=check_for_updates)
-update_button.pack()
+root.withdraw()  # Verstecke das Hauptfenster
 
 current_version = "1.0"  # Aktuelle Version des Programms
-version_label = tk.Label(root, text=f"Version {current_version}")
-version_label.pack(side=tk.BOTTOM)
+check_for_updates()  # Überprüfe auf Updates beim Start
 
 root.mainloop()
